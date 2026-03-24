@@ -28,17 +28,17 @@ The app is composed of a **Root (Orchestrator) agent** plus three specialist age
 ```mermaid
 flowchart TB
   %% User entry
-  U[User] -->|Message| R[Root Agent\nMain Orchestrator]
+  U[User] -->|Message| R["Root Agent<br/>Main Orchestrator"]
 
   %% Root routing
-  R -->|Service center / services / warranty / status| S[service_agent\nService Assistant]
-  R -->|Book / cancel / reschedule| B[booking_agent\nBooking Assistant]
-  R -->|Feedback / complaint / rating| F[feedback_agent\nFeedback Assistant]
+  R -->|Service center / services / warranty / status| S["service_agent<br/>Service Assistant"]
+  R -->|Book / cancel / reschedule| B["booking_agent<br/>Booking Assistant"]
+  R -->|Feedback / complaint / rating| F["feedback_agent<br/>Feedback Assistant"]
 
   %% Toolsets (APIs)
-  subgraph APIs[Backend APIs (OpenAPI Toolsets)]
-    GS[get_services toolset\n/get_service_center\n/get_services]
-    BK[booking_service toolset\n/get_available_slots\n/book_service\n/cancel_booking]
+  subgraph APIs["Backend APIs (OpenAPI Toolsets)"]
+    GS["get_services toolset<br/>POST get_service_center<br/>GET get_services"]
+    BK["booking_service toolset<br/>POST get_available_slots<br/>POST book_service<br/>POST cancel_booking"]
   end
 
   %% Connections to APIs
@@ -46,15 +46,15 @@ flowchart TB
   B -->|getAvailableSlots, bookService, cancelBooking| BK
 
   %% Feedback tool (function)
-  subgraph LocalTools[Local / Function Tools]
-    CF[collect_feedback\n(python_function)]
+  subgraph LocalTools["Local / Function Tools"]
+    CF["collect_feedback<br/>(python_function)"]
   end
   F -->|collect_feedback| CF
 
   %% Guardrails + Global Instructions
   subgraph Controls[Controls]
-    GI[global_instruction.txt\nScope + privacy + no fabrication]
-    GR[Guardrails\nSafety + Prompt]
+    GI["global_instruction.txt<br/>Scope + privacy + no fabrication"]
+    GR["Guardrails<br/>Safety + Prompt"]
   end
 
   R -. governed by .-> GI
