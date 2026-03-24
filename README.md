@@ -21,6 +21,53 @@ The agent is designed to:
 - Protect user privacy and follow guardrails
 
 ## Architecture (multi-agent)
+The app is composed of a **Root (Orchestrator) agent** plus three specialist agents.
+
+### Architecture diagram (Mermaid)
+
+```mermaid
+flowchart TB
+  %% User entry
+  U[User] -->|Message| R[Root Agent\nMain Orchestrator]
+
+  %% Root routing
+  R -->|Service center / services / warranty / status| S[service_agent\nService Assistant]
+  R -->|Book / cancel / reschedule| B[booking_agent\nBooking Assistant]
+  R -->|Feedback / complaint / rating| F[feedback_agent\nFeedback Assistant]
+
+  %% Toolsets (APIs)
+  subgraph APIs[Backend APIs (OpenAPI Toolsets)]
+    GS[get_services toolset\n/get_service_center\n/get_services]
+    BK[booking_service toolset\n/get_available_slots\n/book_service\n/cancel_booking]
+  end
+
+  %% Connections to APIs
+  S -->|getServiceCenter, get_services| GS
+  B -->|getAvailableSlots, bookService, cancelBooking| BK
+
+  %% Feedback tool (function)
+  subgraph LocalTools[Local / Function Tools]
+    CF[collect_feedback\n(python_function)]
+  end
+  F -->|collect_feedback| CF
+
+  %% Guardrails + Global Instructions
+  subgraph Controls[Controls]
+    GI[global_instruction.txt\nScope + privacy + no fabrication]
+    GR[Guardrails\nSafety + Prompt]
+  end
+
+  R -. governed by .-> GI
+  S -. governed by .-> GI
+  B -. governed by .-> GI
+  F -. governed by .-> GI
+
+  R -. enforced by .-> GR
+  S -. enforced by .-> GR
+  B -. enforced by .-> GR
+  F -. enforced by .-> GR
+```
+
 The app is composed of a **Root (Orchestrator) agent** plus three specialist agents:
 
 - **Root agent** (`agents/Root_agent/`)
